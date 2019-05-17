@@ -2,7 +2,7 @@
 Global setting of VN Trader.
 """
 
-from logging import CRITICAL
+from logging import CRITICAL, WARNING
 
 from .utility import load_json
 
@@ -11,9 +11,9 @@ SETTINGS = {
     "font.size": 12,
 
     "log.active": True,
-    "log.level": CRITICAL,
+    "log.level": WARNING,
     "log.console": True,
-    "log.file": True,
+    "log.file": False,
 
     "email.server": "smtp.qq.com",
     "email.port": 465,

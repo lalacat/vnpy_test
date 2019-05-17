@@ -30,11 +30,37 @@ HandlerType = Callable[[Event], None]
 
 class EventEngine:
     """
-    Event engine distributes event object based on its type 
-    to those handlers registered.
+ 事件驱动引擎
+    事件驱动引擎中所有的变量都设置为了私有，这是为了防止不小心
+    从外部修改了这些变量的值或状态，导致bug。
 
-    It also generates timer event by every interval seconds,
-    which can be used for timing purpose.
+    变量说明
+    __queue：私有变量，事件队列
+    __active：私有变量，事件引擎开关
+    __thread：私有变量，事件处理线程
+    __timer：私有变量，计时器
+    __handlers：私有变量，事件处理函数字典
+
+
+    方法说明
+    __run: 私有方法，事件处理线程连续运行用
+    __process: 私有方法，处理事件，调用注册在引擎中的监听函数
+    __onTimer：私有方法，计时器固定事件间隔触发后，向事件队列中存入计时器事件
+    start: 公共方法，启动引擎
+    stop：公共方法，停止引擎
+    register：公共方法，向引擎中注册监听函数
+    unregister：公共方法，向引擎中注销监听函数
+    put：公共方法，向事件队列中存入新的事件
+
+    事件监听函数必须定义为输入参数仅为一个event对象，即：
+
+    函数
+    def func(event)
+        ...
+
+    对象方法
+    def method(self, event)
+
     """
 
     def __init__(self, interval: int = 1):
@@ -52,7 +78,7 @@ class EventEngine:
 
     def _run(self):
         """
-        Get event from queue and then process it.
+        Get event from queue an d then process it.
         """
         while self._active:
             try:
@@ -69,6 +95,7 @@ class EventEngine:
         Then distrubute event to those general handlers which listens
         to all types.
         """
+        # 检查是否存在对该事件进行监听的处理函数
         if event.type in self._handlers:
             [handler(event) for handler in self._handlers[event.type]]
 
@@ -141,3 +168,5 @@ class EventEngine:
         """
         if handler in self._general_handlers:
             self._general_handlers.remove(handler)
+
+

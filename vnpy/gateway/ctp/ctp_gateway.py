@@ -138,8 +138,8 @@ class CtpGateway(BaseGateway):
         """Constructor"""
         super(CtpGateway, self).__init__(event_engine, "CTP")
 
-        self.td_api = CtpTdApi(self)
-        self.md_api = CtpMdApi(self)
+        self.td_api = CtpTdApi(self) # 行情API
+        self.md_api = CtpMdApi(self) # 交易API
 
     def connect(self, setting: dict):
         """"""
@@ -386,7 +386,10 @@ class CtpTdApi(TdApi):
         self.sysid_orderid_map = {}
         
     def onFrontConnected(self):
-        """"""
+        """
+        连接交易前置
+        :return:
+        """
         self.connect_status = True
         self.gateway.write_log("交易连接成功")
         

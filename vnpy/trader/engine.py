@@ -65,6 +65,8 @@ class MainEngine:
     def add_app(self, app_class: BaseApp):
         """
         Add app.
+
+        添加策略，这块试着改写成twisted模式
         """
         app = app_class()
         self.apps[app.app_name] = app
@@ -319,7 +321,12 @@ class OmsEngine(BaseEngine):
         self.event_engine.register(EVENT_CONTRACT, self.process_contract_event)
 
     def process_tick_event(self, event: Event):
-        """"""
+        """
+
+        :param event:
+        :return:
+        处理tick事件
+        """
         tick = event.data
         self.ticks[tick.vt_symbol] = tick
 
