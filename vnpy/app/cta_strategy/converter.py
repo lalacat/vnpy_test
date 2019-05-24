@@ -14,7 +14,9 @@ from vnpy.trader.constant import (Direction, Offset, Exchange)
 
 
 class OffsetConverter:
-    """"""
+    """
+    持仓信息的类
+    """
 
     def __init__(self, main_engine: MainEngine):
         """"""
@@ -91,7 +93,10 @@ class OffsetConverter:
 
 
 class PositionHolding:
-    """"""
+    """
+    本地的持仓信息
+
+    """
 
     def __init__(self, contract: ContractData):
         """"""
@@ -117,7 +122,12 @@ class PositionHolding:
         self.short_td_frozen = 0
 
     def update_position(self, position: PositionData):
-        """"""
+        """
+        开仓的方向
+        仓位容量
+        :param position
+        :return:
+        """
         if position.direction == Direction.LONG:
             self.long_pos = position.volume
             self.long_yd = position.yd_volume

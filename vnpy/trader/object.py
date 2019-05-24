@@ -176,9 +176,9 @@ class PositionData(BaseData):
     exchange: Exchange
     direction: Direction
 
-    volume: float = 0
-    frozen: float = 0
-    price: float = 0
+    volume: float = 0 # 持仓数
+    frozen: float = 0 # 冻结资金
+    price: float = 0 # 持仓价格
     pnl: float = 0
     yd_volume: float = 0
 

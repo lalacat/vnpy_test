@@ -64,7 +64,9 @@ STOP_STATUS_MAP = {
 
 
 class CtaEngine(BaseEngine):
-    """"""
+    """
+    交易时使用策略引擎类
+    """
 
     engine_type = EngineType.LIVE  # live trading engine
 
@@ -102,11 +104,11 @@ class CtaEngine(BaseEngine):
     def init_engine(self):
         """
         """
-        self.init_rqdata()
-        self.load_strategy_class()
-        self.load_strategy_setting()
-        self.load_strategy_data()
-        self.register_event()
+        self.init_rqdata()  # 加载数据接口
+        self.load_strategy_class() # 加载策略
+        self.load_strategy_setting() # 加载策略设定
+        self.load_strategy_data()  # 加载数据
+        self.register_event()  # 加载信息处理
         self.write_log("CTA策略引擎初始化成功")
 
     def close(self):
@@ -115,10 +117,10 @@ class CtaEngine(BaseEngine):
 
     def register_event(self):
         """"""
-        self.event_engine.register(EVENT_TICK, self.process_tick_event)
-        self.event_engine.register(EVENT_ORDER, self.process_order_event)
-        self.event_engine.register(EVENT_TRADE, self.process_trade_event)
-        self.event_engine.register(EVENT_POSITION, self.process_position_event)
+        self.event_engine.register(EVENT_TICK, self.process_tick_event) # 处理tick数据
+        self.event_engine.register(EVENT_ORDER, self.process_order_event) # 处理order
+        self.event_engine.register(EVENT_TRADE, self.process_trade_event) # 将处理好的订单传入eventEngine 进行策略交易
+        self.event_engine.register(EVENT_POSITION, self.process_position_event) # 更新仓位信息
 
     def init_rqdata(self):
         """
@@ -140,7 +142,11 @@ class CtaEngine(BaseEngine):
         return data
 
     def process_tick_event(self, event: Event):
-        """"""
+        """
+        处理tick数据
+        :param event:
+        :return:
+        """
         tick = event.data
 
         strategies = self.symbol_strategy_map[tick.vt_symbol]
@@ -154,7 +160,11 @@ class CtaEngine(BaseEngine):
                 self.call_strategy_func(strategy, strategy.on_tick, tick)
 
     def process_order_event(self, event: Event):
-        """"""
+        """
+        处理订单事件，最后返回的是处理过的strategy
+        :param event:
+        :return:
+        """
         order = event.data
         
         self.offset_converter.update_order(order)
@@ -187,7 +197,12 @@ class CtaEngine(BaseEngine):
         self.call_strategy_func(strategy, strategy.on_order, order)
 
     def process_trade_event(self, event: Event):
-        """"""
+        """
+        根据交易设定的策略，对相应的策略进行处理，处理后的策略封装，放入到事件处理引擎
+
+        :param event:
+        :return:
+        """
         trade = event.data
 
         self.offset_converter.update_trade(trade)
@@ -302,14 +317,17 @@ class CtaEngine(BaseEngine):
         vt_orderids = []
 
         for req in req_list:
+            # 通过此处发送订单
             vt_orderid = self.main_engine.send_order(
                 req, contract.gateway_name)
+            # 记录上报的订单的编号
             vt_orderids.append(vt_orderid)
 
             self.offset_converter.update_order_request(req, vt_orderid)
             
             # Save relationship between orderid and strategy.
             self.orderid_strategy_map[vt_orderid] = strategy
+            # 将开单的信息保存到对应的策略下
             self.strategy_orderid_map[strategy.strategy_name].add(vt_orderid)
 
         return vt_orderids
@@ -703,13 +721,18 @@ class CtaEngine(BaseEngine):
 
     def load_strategy_class(self):
         """
+        # TODO 可以修改成scapy文件读取
         Load strategy class from source code.
+        两个策略加载点，第一个是整个项目的策略加载vnpy\app\cta_strategy\strategies
+        另一个是代码运行目录下的strategies
         """
         path1 = Path(__file__).parent.joinpath("strategies")
+        print('path1: %s'%path1)
         self.load_strategy_class_from_folder(
             path1, "vnpy.app.cta_strategy.strategies")
 
         path2 = Path.cwd().joinpath("strategies")
+        print('path2 : %s' %path2)
         self.load_strategy_class_from_folder(path2, "strategies")
 
     def load_strategy_class_from_folder(self, path: Path, module_name: str = ""):
@@ -803,7 +826,7 @@ class CtaEngine(BaseEngine):
         Load setting file.
         """
         self.strategy_setting = load_json(self.setting_filename)
-
+        print(self.strategy_setting)
         for strategy_name, strategy_config in self.strategy_setting.items():
             self.add_strategy(
                 strategy_config["class_name"], 

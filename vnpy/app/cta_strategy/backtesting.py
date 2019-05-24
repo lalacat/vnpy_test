@@ -477,6 +477,7 @@ class BacktestingEngine:
             return
 
         # Use multiprocessing pool for running backtesting with different setting
+        # TODO deferlist
         pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
         results = []
@@ -892,7 +893,15 @@ class DailyResult:
         rate: float,
         slippage: float,
     ):
-        """"""
+        """
+        净盈亏
+        :param pre_close:
+        :param start_pos:
+        :param size:
+        :param rate:
+        :param slippage:
+        :return:
+        """
         self.pre_close = pre_close
 
         # Holding pnl is the pnl from holding position at day start

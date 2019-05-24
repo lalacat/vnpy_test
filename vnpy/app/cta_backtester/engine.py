@@ -27,6 +27,7 @@ EVENT_BACKTESTER_OPTIMIZATION_FINISHED = "eBacktesterOptimizationFinished"
 class BacktesterEngine(BaseEngine):
     """
     For running CTA strategy backtesting.
+    回测时的引擎
     """
 
     def __init__(self, main_engine: MainEngine, event_engine: EventEngine):
