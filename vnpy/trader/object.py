@@ -97,13 +97,14 @@ class BarData(BaseData):
         self.vt_symbol = f"{self.symbol}.{self.exchange.value}"
 
 
+
+
 @dataclass
 class OrderData(BaseData):
     """
     Order data contains information for tracking lastest status 
     of a specific order.
     """
-
     symbol: str
     exchange: Exchange
     orderid: str

@@ -58,7 +58,8 @@ class DbBarData(Document):
                 "fields": ("datetime", "interval", "symbol", "exchange"),
                 "unique": True,
             }
-        ]
+        ],
+
     }
 
     @staticmethod

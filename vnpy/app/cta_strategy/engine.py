@@ -78,6 +78,7 @@ class CtaEngine(BaseEngine):
         super(CtaEngine, self).__init__(
             main_engine, event_engine, APP_NAME)
 
+
         self.strategy_setting = {}  # strategy_name: dict
         self.strategy_data = {}     # strategy_name: dict
 
@@ -149,7 +150,7 @@ class CtaEngine(BaseEngine):
         """
         tick = event.data
 
-        strategies = self.symbol_strategy_map[tick.vt_symbol]
+        strategies = self.symbol_strategy_map[tick.vt_symbol] # 根据tick的合约名称获得策略
         if not strategies:
             return
 
@@ -226,19 +227,29 @@ class CtaEngine(BaseEngine):
         self.offset_converter.update_position(position)
 
     def check_stop_order(self, tick: TickData):
-        """"""
+        """
+
+        :param tick:
+        :return:
+        """
+        # 从stop_orders中循环获得设定的stop_order
         for stop_order in list(self.stop_orders.values()):
+            # 设定的止损单与传入的止损单的合约号对比，只有一致才继续，这是为了多合约策略准备
             if stop_order.vt_symbol != tick.vt_symbol:
                 continue
-
+            # 开多条件触发：多头止损为多且tick数据的最新价不低于止损单的价格的时候触发，
+            # 当最新价低于止损价的时候，就没必要开多，或者进入止损的状态
             long_triggered = (
                 stop_order.direction == Direction.LONG and tick.last_price >= stop_order.price
             )
+            # 开空条件触发：空头止损且tick数据的最新价不能高于止损单的价格
+            # 当最新价高于止损价的时候，不需要开仓，或者进行平空操作
             short_triggered = (
                 stop_order.direction == Direction.SHORT and tick.last_price <= stop_order.price
             )
-
+            # 开单标志触发的时候才调用策略
             if long_triggered or short_triggered:
+                # 根据止损单的策略名调用策略
                 strategy = self.strategies[stop_order.strategy_name]
 
                 # To get excuted immediately after stop order is
